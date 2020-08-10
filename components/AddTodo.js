@@ -1,6 +1,7 @@
 import React, { Component, useState } from 'react';
 import Constants from 'expo-constants';
 import { SafeAreaView, StyleSheet, Text, View, TextInput, Button, ToastAndroid} from 'react-native';
+import Axios from 'axios';
 
 class AddTodo extends Component {
 
@@ -21,7 +22,7 @@ class AddTodo extends Component {
 
                 <View style={styles.alignedContainer}>
                     <Text style={styles.headerText}></Text>
-                    <TextInput style={styles.inputText} placeholder="Type what you want to do."></TextInput>
+                    <TextInput style={styles.inputText} placeholder="Type what you want to do." onChangeText={text => this.setState({todoText: text})}></TextInput>
                     <Button style={styles.addTodoButton} title="Add To-Do" onPress={() => this.addHabiticaTodo()} disabled={this.state.addInProgress}></Button>
                 </View>
             </SafeAreaView>
@@ -30,8 +31,26 @@ class AddTodo extends Component {
 
     addHabiticaTodo()
     {
-        ToastAndroid.show("Successfully added todo to Habitica!", ToastAndroid.LONG);
+        //console.log("Successfully added \"" + this.state.todoText + "\" to Habitica!");
+        ToastAndroid.show("Successfully added \"" + this.state.todoText + "\" to Habitica!", ToastAndroid.LONG);
         this.setState({addInProgress: true});
+    }
+
+    async MakeHttpRequest()
+    {
+        Axios({
+            method: "post",
+            url: "https://habitica.com/api/v3/tasks/user",
+            headers:{
+                "x-client": "",
+                "x-api-user": "",
+                "x-api-key": ""
+            },
+            data:{
+                text: this.state.todoText,
+                type: "todo"
+            }
+        });
     }
 }
 
