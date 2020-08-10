@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { AddTodo } from './components/AddTodo'
+import { DrawerMenu} from './components/DrawerMenu'
+import { DrawerLayoutAndroid } from 'react-native';
 
 export default class App extends Component{
     
@@ -8,6 +10,10 @@ export default class App extends Component{
   }
 
   render() {
-    return <AddTodo/>
+    return (
+      <DrawerLayoutAndroid drawerWidth={200} drawerPosition="left" renderNavigationView={() => <DrawerMenu/>}>
+        <AddTodo/>
+      </DrawerLayoutAndroid>
+    )
   }
 }
