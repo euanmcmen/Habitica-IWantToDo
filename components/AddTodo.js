@@ -1,10 +1,10 @@
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import Constants from 'expo-constants';
-import { SafeAreaView, StyleSheet, Text, View, TextInput, Button, ToastAndroid} from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, TextInput, Button, ToastAndroid, Keyboard} from 'react-native';
 import Axios from 'axios';
+import secrets from '../secrets';
 
 class AddTodo extends Component {
-
     constructor(props)
     {
         super(props);
@@ -20,10 +20,13 @@ class AddTodo extends Component {
             <SafeAreaView style={styles.mainContainer}>
                 <Text style={styles.headerText}>Habitica To-Do</Text>
 
-                <View style={styles.alignedContainer}>
-                    <Text style={styles.headerText}></Text>
-                    <TextInput style={styles.inputText} placeholder="Type what you want to do." onChangeText={text => this.setState({todoText: text})}></TextInput>
-                    <Button style={styles.addTodoButton} title="Add To-Do" onPress={() => this.addHabiticaTodo()} disabled={this.state.addInProgress}></Button>
+                <View style={styles.alignedContainer}>                   
+                    <TextInput style={styles.inputText} 
+                        placeholder="Type what you want to do..." 
+                        onChangeText={text => this.setState({todoText: text})}
+                        value={this.state.todoText} />
+
+                    <Button style={styles.addTodoButton} title="Add To-Do" onPress={() => this.addHabiticaTodo()} disabled={this.state.addInProgress} />
                 </View>
             </SafeAreaView>
         );
@@ -31,20 +34,39 @@ class AddTodo extends Component {
 
     addHabiticaTodo()
     {
-        //console.log("Successfully added \"" + this.state.todoText + "\" to Habitica!");
-        ToastAndroid.show("Successfully added \"" + this.state.todoText + "\" to Habitica!", ToastAndroid.LONG);
+        if (this.state.todoText === "")
+        {
+            ToastAndroid.showWithGravity("Please type what you want to add.", ToastAndroid.SHORT, ToastAndroid.BOTTOM);
+            return;
+        }
+
+        //Disable the button so the user can't re-add the task.
         this.setState({addInProgress: true});
+        Keyboard.dismiss();
+
+        this.makeHabiticaHttpRequestAsync()
+        .then(() => {
+            ToastAndroid.showWithGravity("Successfully added \"" + this.state.todoText + "\" to Habitica!", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+            this.setState({todoText: ""});
+        })
+        .catch(() => {
+            ToastAndroid.showWithGravity("Error - Failed to add \"" + this.state.todoText + "\" to Habitica.", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+        })
+        .finally(() => {
+            this.setState({addInProgress: false});
+        })
     }
 
-    async MakeHttpRequest()
+    async makeHabiticaHttpRequestAsync()
     {
         Axios({
             method: "post",
             url: "https://habitica.com/api/v3/tasks/user",
             headers:{
-                "x-client": "",
-                "x-api-user": "",
-                "x-api-key": ""
+                //The secrets.js file is intentionally excluded from Git.
+                "x-client": secrets.ApiUserId + "-" + secrets.ApiAppName,
+                "x-api-user": secrets.ApiUserId,
+                "x-api-key": secrets.ApiKey
             },
             data:{
                 text: this.state.todoText,
@@ -62,7 +84,7 @@ const styles = StyleSheet.create({
     },
     headerText:{
         textAlign: 'center',
-        marginBottom: 5
+        fontSize: 24
     },
     alignedContainer: {
         flex: 1,
