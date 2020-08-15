@@ -1,5 +1,5 @@
 export default {
-    ApiAppName: "xxxxxxxxxxxxxxxxxxxx",
+    ApiAppName: "Testing",
     ApiUserId: "xxxxxxxxxxxxxxxxxxxx",
     ApiKey: "xxxxxxxxxxxxxxxxxxxx"
 };
