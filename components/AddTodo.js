@@ -63,7 +63,6 @@ class AddTodo extends Component {
             method: "post",
             url: "https://habitica.com/api/v3/tasks/user",
             headers:{
-                //The secrets.js file is intentionally excluded from Git.
                 "x-client": secrets.ApiUserId + "-" + secrets.ApiAppName,
                 "x-api-user": secrets.ApiUserId,
                 "x-api-key": secrets.ApiKey
